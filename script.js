@@ -1,9 +1,12 @@
 const quoteContainer = document.getElementById('quote-container');
+const favouriteContainer = document.getElementById('favourites-container');
 const quoteText = document.getElementById('quote');
 const authorText = document.getElementById('author');
 const twitterButton = document.getElementById('twitter');
 const newQuoteBtn = document.getElementById('new-quote');
+const favouriteBtn = document.getElementById('favourite')
 const loader = document.getElementById('loader');
+const deleteQuoteBtn = document.getElementById('delete-quote');
 
 //Show loading
 function loading() {
@@ -76,9 +79,73 @@ function tweetQuote() {
     window.open(twitterUrl, '_blank');
 }
 
+//delete the quote from local storage
+function deleteQuoteLocalStorage() {
+    console.log('delete')
+}
+//Save Quote to local Storage
+function saveQuoteLocalStorage() {
+    let quote = `${quoteText.innerText} - ${authorText.innerText}`;
+    const quotes = getQuoteLocalStorage();   
+    //Add the quote into the array
+    quotes.push(quote);
+    //Convert array into a string and add into local storage
+    localStorage.setItem( 'quotes', JSON.stringify(quotes) );
+}
+
+//Check local storage for existing favourite quotes
+function getQuoteLocalStorage() {
+    let quotes;
+    const quotesLS = localStorage.getItem('quotes');
+    //Get quotes, if null is returned then create an empty array
+    if(quotesLS === null) {
+        quotes = []
+    } else {
+        quotes = JSON.parse(quotesLS);
+    }
+    return quotes;
+}
+
+//Show favourite quote
+function showFavourite() {
+    //display favourites container
+    let quote = `${quoteText.innerText} - ${authorText.innerText}`;
+    //Create li
+    let li = document.createElement('li');
+    //insert quote into li
+    li.innerHTML = `${quote} <button id="delete-quote"><i class="fas fa-trash-alt"></button></i>`
+    //insert li into the DOM
+    const savedQuotes = document.getElementById('saved-quotes');
+
+    savedQuotes.appendChild(li);
+
+    //Save to local Storage
+    saveQuoteLocalStorage()
+}
+
+//Show favourite tweets on load
+function showFavouriteOnLoad() {
+    let quotes = getQuoteLocalStorage();
+    //Loop through storage and print the quotes
+    quotes.forEach(function(quote) {
+        //Create li
+        let li = document.createElement('li');
+        //insert quote into li
+        li.innerHTML = `${quote} <button><i class="fas fa-trash-alt"></button></i>`
+        //insert li into the DOM
+        const savedQuotes = document.getElementById('saved-quotes');
+        savedQuotes.appendChild(li);
+    })
+}
+
 //Event listeners
 newQuoteBtn.addEventListener('click', getQuotes);
 twitterButton.addEventListener('click', tweetQuote);
+favouriteBtn.addEventListener('click', showFavourite);
+if(deleteQuoteBtn) {
+    deleteQuoteBtn.addEventListener('click', deleteQuoteLocalStorage);
+}
+document.addEventListener('DOMContentLoaded', showFavouriteOnLoad);
 
 
 //On load
